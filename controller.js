@@ -19,8 +19,9 @@ const addEventListener = function(document, paddle) {
 };
 
 const drawBall = function(ballDiv, ball) {
-  ballDiv.style.height = addPixelSuffix(ball.height);
-  ballDiv.style.width = addPixelSuffix(ball.width);
+  ballDiv.style.height = addPixelSuffix(ball.diameter);
+  ballDiv.style.width = addPixelSuffix(ball.diameter);
+  ballDiv.style.borderRadius = addPixelSuffix(ball.diameter / 2);
   ballDiv.style.left = addPixelSuffix(ball.left);
   ballDiv.style.bottom = addPixelSuffix(ball.bottom);
 };
@@ -50,12 +51,12 @@ const createPaddle = function(document, paddle) {
   drawPaddle(paddleDiv, paddle);
 };
 
-const initialize = function() {
+const initializeGame = function() {
   let paddle = new Paddle(20, 100, 450, 5);
-  let ball = new Ball(20, 20, 490, 25);
+  let ball = new Ball(30, 490, 25);
   createPaddle(document, paddle);
   createBall(document, ball);
   addEventListener(document, paddle);
 };
 
-window.onload = initialize;
+window.onload = initializeGame;

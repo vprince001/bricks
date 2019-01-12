@@ -1,7 +1,6 @@
 class Ball {
-  constructor(height, width, left, bottom) {
-    this.height = height;
-    this.width = width;
+  constructor(diameter, left, bottom) {
+    this.diameter = diameter;
     this.left = left;
     this.bottom = bottom;
   }
