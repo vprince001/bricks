@@ -1,0 +1,18 @@
+.ball {
+  background-color: black;
+  position: absolute;
+  border-radius: 10px;
+}
+
+.paddle {
+  background-color: black;
+  position: absolute;
+}
+
+main {
+  margin: 0 auto;
+  width: 1000px;
+  height: 650px;
+  border: solid black 5px;
+  position: relative;
+}
