@@ -1,6 +1,10 @@
-.ball {
-  background-color: black;
-  position: absolute;
+main {
+  margin: 0 auto;
+  width: 1000px;
+  height: 650px;
+  position: relative;
+  border: solid black 5px;
+  border-bottom: solid red 10px;
 }
 
 .paddle {
@@ -8,19 +12,16 @@
   position: absolute;
 }
 
-.wall {
+.ball {
   background-color: black;
   position: absolute;
 }
 
-.bottom-Wall{
-  background-color:red;
+.wall {
   position: absolute;
 }
 
-main {
-  margin: 0 auto;
-  width: 1000px;
-  height: 650px;
-  position: relative;
+.brick{
+  background-color:blue;
+  position: absolute;
 }

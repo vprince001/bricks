@@ -39,54 +39,97 @@ const addEventListener = function(document, classes) {
   main.onkeydown = movePaddle.bind(null, document, classes, countUp);
 };
 
+const collidingBrickLeftRight = function(brick, ball) {
+  const havingSameRightX = ball.left == brick.left + brick.width;
+  const havingSameLeftX = ball.left == brick.left - ball.width;
+
+  const isInBrickVerticalRange =
+    ball.bottom > brick.bottom - ball.borderRadius &&
+    ball.bottom < brick.bottom + brick.height + ball.borderRadius;
+
+  if (isInBrickVerticalRange && (havingSameRightX || havingSameLeftX)) {
+    ball.xStatus = toggleState(ball.xStatus);
+  }
+};
+
+const collidingBrickTopDown = function(brick, ball) {
+  const havingSameTopY = ball.bottom == brick.bottom + brick.height;
+  const havingSameBottomY = ball.bottom == brick.bottom - ball.height;
+
+  const isInBrickHorizontalRange =
+    ball.left > brick.left - ball.borderRadius &&
+    ball.left < brick.left + brick.width + ball.borderRadius;
+
+  if (isInBrickHorizontalRange && (havingSameTopY || havingSameBottomY)) {
+    ball.yStatus = toggleState(ball.yStatus);
+  }
+};
+
 const declareGameOver = function(ball, bottomWall, moveBall) {
-  if (ball.bottom == bottomWall.bottom) {
+  const isCollidingBottomWall = ball.bottom == bottomWall.bottom;
+  if (isCollidingBottomWall) {
     clearInterval(moveBall);
     alert("GAME OVER");
   }
 };
 
-const changeDirection = function(classes) {
-  let { paddle, ball, rightWall, topWall, leftWall } = classes;
-  let paddleTop = 24;
-
-  let rightWallX = rightWall.left - ball.width;
+const collidingTopWall = function(topWall, ball) {
   let topWallY = topWall.bottom - ball.width;
+  const isColliding = ball.bottom == topWallY;
+  if (isColliding) {
+    ball.yStatus = toggleState(ball.yStatus);
+  }
+};
+
+const collidingSideWalls = function(rightWall, leftWall, ball) {
+  let rightWallX = rightWall.left - ball.width;
+  const isColliding = ball.left == rightWallX || ball.left == leftWall.left;
+
+  if (isColliding) {
+    ball.xStatus = toggleState(ball.xStatus);
+  }
+};
+
+const collidingPaddle = function(paddle, ball) {
+  const paddleTop = paddle.bottom + paddle.height;
 
   const isInPaddleRange =
     ball.left > paddle.left - ball.borderRadius &&
     ball.left < paddle.left + paddle.width + ball.borderRadius;
 
-  const collideWithSideWalls =
-    ball.left == rightWallX || ball.left == leftWall.left;
-  const collideWithTopWall = ball.bottom == topWallY;
-  const collideWithPaddle = ball.bottom == paddleTop && isInPaddleRange;
-
-  if (collideWithSideWalls) {
-    ball.xStatus = toggleState(ball.xStatus);
-  }
-
-  if (collideWithTopWall) {
-    ball.yStatus = toggleState(ball.yStatus);
-  }
-
-  if (collideWithPaddle) {
+  const isColliding = ball.bottom == paddleTop && isInPaddleRange;
+  if (isColliding) {
     ball.yStatus = toggleState(ball.yStatus);
   }
 };
 
+const changeDirection = function(classes) {
+  let { paddle, rightWall, leftWall, topWall, ball, brick } = classes;
+
+  collidingPaddle(paddle, ball);
+  collidingSideWalls(rightWall, leftWall, ball);
+  collidingTopWall(topWall, ball);
+  collidingBrickTopDown(brick, ball);
+  collidingBrickLeftRight(brick, ball);
+};
+
 const startBall = function(document, classes) {
-  let { ball, bottomWall } = classes;
+  const { ball, bottomWall, brick } = classes;
   const ballStyle = document.getElementById("ball1").style;
 
   let moveBall = setInterval(function() {
-    changeDirection(classes);
-    declareGameOver(ball, bottomWall, moveBall);
-
     ball.move();
     ballStyle.left = addPixelSuffix(ball.left);
     ballStyle.bottom = addPixelSuffix(ball.bottom);
+    changeDirection(classes);
+    declareGameOver(ball, bottomWall, moveBall);
   }, 5);
+};
+
+const createBricks = function(document, brick) {
+  for (let id = 1; id < 2; id++) {
+    generateObject(document, brick, "brick", id);
+  }
 };
 
 const drawObject = function(objectStyle, classInstance) {
@@ -108,22 +151,23 @@ const generateObject = function(document, classInstance, divClassName, divId) {
 const createObjects = function(document, classes) {
   const { paddle, ball, rightWall, leftWall, topWall, bottomWall } = classes;
 
-  generateObject(document, paddle, "paddle", "paddle1");
+  generateObject(document, paddle, "paddle", "paddle1"); //document, classInstance, divClassName, divId
   generateObject(document, ball, "ball", "ball1");
   generateObject(document, rightWall, "wall", "rightWall");
   generateObject(document, leftWall, "wall", "leftWall");
   generateObject(document, topWall, "wall", "topWall");
-  generateObject(document, bottomWall, "bottom-Wall", "bottomWall");
+  generateObject(document, bottomWall, "wall", "bottomWall");
 };
 
 const createClasses = function() {
   const classes = {
-    paddle: new Paddle(20, 100, 450, 5, 0), //height, width, left, bottom, border-radius
-    ball: new Ball(30, 30, 490, 25, 15, true, true), //....xStatus, yStatus
-    rightWall: new RightWall(650, 3, 997, 0, 0),
-    leftWall: new LeftWall(650, 3, 0, 0, 0),
-    topWall: new TopWall(3, 1000, 0, 650, 0),
-    bottomWall: new BottomWall(5, 1000, 0, 0, 0)
+    paddle: new Paddle(20, 150, 425, 0, 0), //height, width, left, bottom, border-radius
+    ball: new Ball(30, 30, 490, 20, 15, true, true), //....xStatus, yStatus
+    rightWall: new RightWall(650, 0, 1000, 0, 0),
+    leftWall: new LeftWall(650, 0, 0, 0, 0),
+    topWall: new TopWall(0, 1000, 0, 650, 0),
+    bottomWall: new BottomWall(0, 1000, 0, 0, 0),
+    brick: new Brick(100, 400, 300, 250, 10)
   };
   return classes;
 };
@@ -131,6 +175,7 @@ const createClasses = function() {
 const initializeGame = function() {
   const classes = createClasses();
   createObjects(document, classes);
+  createBricks(document, classes.brick);
   addEventListener(document, classes);
 };
 
