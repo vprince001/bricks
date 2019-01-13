@@ -8,10 +8,19 @@
   position: absolute;
 }
 
+.wall {
+  background-color: black;
+  position: absolute;
+}
+
+.bottom-Wall{
+  background-color:red;
+  position: absolute;
+}
+
 main {
   margin: 0 auto;
   width: 1000px;
   height: 650px;
-  border: solid black 5px;
   position: relative;
 }

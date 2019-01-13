@@ -1,20 +1,21 @@
 class Paddle {
-  constructor(height, width, left, bottom) {
+  constructor(height, width, left, bottom, borderRadius) {
     this.height = height;
     this.width = width;
     this.left = left;
     this.bottom = bottom;
+    this.borderRadius = borderRadius;
   }
 
   moveLeft() {
-    this.left -= 10;
+    if (this.left > 0) {
+      this.left -= 10;
+    }
   }
 
   moveRight() {
-    this.left += 10;
-  }
-
-  getPaddleX() {
-    return this.left;
+    if (this.left < 900) {
+      this.left += 10;
+    }
   }
 }
