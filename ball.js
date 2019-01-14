@@ -10,19 +10,24 @@ class Ball {
   }
 
   move() {
-    if (this.xStatus && this.yStatus) {
+    const upRight = this.xStatus && this.yStatus;
+    const upLeft = !this.xStatus && this.yStatus;
+    const downLeft = !this.xStatus && !this.yStatus;
+    const downRight = this.xStatus == true && !this.yStatus;
+
+    if (upRight) {
       this.left += 1;
       this.bottom += 1;
     }
-    if (!this.xStatus && this.yStatus) {
+    if (upLeft) {
       this.left -= 1;
       this.bottom += 1;
     }
-    if (!this.xStatus && !this.yStatus) {
+    if (downLeft) {
       this.left -= 1;
       this.bottom -= 1;
     }
-    if (this.xStatus == true && !this.yStatus) {
+    if (downRight) {
       this.left += 1;
       this.bottom -= 1;
     }

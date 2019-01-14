@@ -7,7 +7,7 @@ const toggleState = function(state) {
   return true;
 };
 
-const movePaddle = function(document, classes, countUp) {
+const manageKeyEvents = function(document, classes, countUp) {
   const { paddle } = classes;
   const paddleStyle = document.getElementById("paddle1").style;
   if (event.key == "ArrowLeft") {
@@ -20,7 +20,7 @@ const movePaddle = function(document, classes, countUp) {
     paddleStyle.left = addPixelSuffix(paddle.left);
   }
 
-  if (event.key == "s" && countUp() == 1) {
+  if (event.key == "Enter" && countUp() == 1) {
     startBall(document, classes);
   }
 };
@@ -36,33 +36,7 @@ const addEventListener = function(document, classes) {
   let main = document.getElementById("gameArea");
   main.focus();
   const countUp = makeCounter(1);
-  main.onkeydown = movePaddle.bind(null, document, classes, countUp);
-};
-
-const collidingBrickLeftRight = function(brick, ball) {
-  const havingSameRightX = ball.left == brick.left + brick.width;
-  const havingSameLeftX = ball.left == brick.left - ball.width;
-
-  const isInBrickVerticalRange =
-    ball.bottom > brick.bottom - ball.borderRadius &&
-    ball.bottom < brick.bottom + brick.height + ball.borderRadius;
-
-  if (isInBrickVerticalRange && (havingSameRightX || havingSameLeftX)) {
-    ball.xStatus = toggleState(ball.xStatus);
-  }
-};
-
-const collidingBrickTopDown = function(brick, ball) {
-  const havingSameTopY = ball.bottom == brick.bottom + brick.height;
-  const havingSameBottomY = ball.bottom == brick.bottom - ball.height;
-
-  const isInBrickHorizontalRange =
-    ball.left > brick.left - ball.borderRadius &&
-    ball.left < brick.left + brick.width + ball.borderRadius;
-
-  if (isInBrickHorizontalRange && (havingSameTopY || havingSameBottomY)) {
-    ball.yStatus = toggleState(ball.yStatus);
-  }
+  main.onkeydown = manageKeyEvents.bind(null, document, classes, countUp);
 };
 
 const declareGameOver = function(ball, bottomWall, moveBall) {
@@ -104,32 +78,24 @@ const collidingPaddle = function(paddle, ball) {
 };
 
 const changeDirection = function(classes) {
-  let { paddle, rightWall, leftWall, topWall, ball, brick } = classes;
+  let { paddle, rightWall, leftWall, topWall, ball } = classes;
 
   collidingPaddle(paddle, ball);
   collidingSideWalls(rightWall, leftWall, ball);
   collidingTopWall(topWall, ball);
-  collidingBrickTopDown(brick, ball);
-  collidingBrickLeftRight(brick, ball);
 };
 
 const startBall = function(document, classes) {
-  const { ball, bottomWall, brick } = classes;
+  const { ball, bottomWall } = classes;
   const ballStyle = document.getElementById("ball1").style;
 
   let moveBall = setInterval(function() {
     ball.move();
     ballStyle.left = addPixelSuffix(ball.left);
     ballStyle.bottom = addPixelSuffix(ball.bottom);
-    changeDirection(classes);
+    changeDirection(classes, document);
     declareGameOver(ball, bottomWall, moveBall);
   }, 5);
-};
-
-const createBricks = function(document, brick) {
-  for (let id = 1; id < 2; id++) {
-    generateObject(document, brick, "brick", id);
-  }
 };
 
 const drawObject = function(objectStyle, classInstance) {
@@ -145,7 +111,7 @@ const generateObject = function(document, classInstance, divClassName, divId) {
   objectDiv.className = divClassName;
   objectDiv.id = divId;
   document.getElementById("gameArea").appendChild(objectDiv);
-  drawObject(objectDiv.style, classInstance);
+  return drawObject(objectDiv.style, classInstance);
 };
 
 const createObjects = function(document, classes) {
@@ -166,8 +132,7 @@ const createClasses = function() {
     rightWall: new RightWall(650, 0, 1000, 0, 0),
     leftWall: new LeftWall(650, 0, 0, 0, 0),
     topWall: new TopWall(0, 1000, 0, 650, 0),
-    bottomWall: new BottomWall(0, 1000, 0, 0, 0),
-    brick: new Brick(100, 400, 300, 250, 10)
+    bottomWall: new BottomWall(0, 1000, 0, 0, 0)
   };
   return classes;
 };
@@ -175,7 +140,6 @@ const createClasses = function() {
 const initializeGame = function() {
   const classes = createClasses();
   createObjects(document, classes);
-  createBricks(document, classes.brick);
   addEventListener(document, classes);
 };
 
